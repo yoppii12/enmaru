@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SEEKER
+  NURSERY
+  ADMIN
+}
+
+enum MatchStatus {
+  APPLIED
+  SCREENING
+  MATCHED
+  WORKING
+  COMPLETED
+  REVIEW_OPEN
+  REVIEW_DONE
+}
+
+enum ReviewStatus {
+  NONE
+  PARTIAL
+  DONE
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+}
+
+model User {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  role       Role
+  isActive   Boolean   @default(true)
+  agreedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  supabaseId String?   @unique
+  lineUserId String?   @unique
+
+  seekerProfile  SeekerProfile?
+  nurseryProfile NurseryProfile?
+}
+
+model SeekerProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  realName       String?
+  displayName    String?
+  license        Boolean  @default(false)
+  blankYears     String?
+  preferredArea  String?
+  preferredStyle String[] @default([])
+  bio            String?
+  experience     String?
+  skills         String?
+  ngConditions   String?
+  isPublished    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  applications    Application[]
+  matches         Match[]                 @relation("SeekerMatches")
+  reviewsGiven    ReviewSeekerToNursery[]
+  reviewsReceived ReviewNurseryToSeeker[]
+}
+
+model NurseryProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  nurseryName String
+  area        String
+  address     String?
+  contactName String?
+  phone       String?
+  concept     String?
+  policy      String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  jobPostings     JobPosting[]
+  matches         Match[]                 @relation("NurseryMatches")
+  reviewsGiven    ReviewNurseryToSeeker[]
+  reviewsReceived ReviewSeekerToNursery[]
+}
+
+model JobPosting {
+  id            String         @id @default(cuid())
+  nurseryId     String
+  nursery       NurseryProfile @relation(fields: [nurseryId], references: [id])
+  title         String
+  workContent   String
+  workDate      DateTime
+  workTimeStart String
+  workTimeEnd   String
+  hourlyWage    Int?
+  targetPerson  String?
+  remarks       String?
+  status        JobStatus      @default(OPEN)
+  postedAt      DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  applications Application[]
+  matches      Match[]
+}
+
+model Application {
+  id            String        @id @default(cuid())
+  jobId         String
+  job           JobPosting    @relation(fields: [jobId], references: [id])
+  seekerId      String
+  seeker        SeekerProfile @relation(fields: [seekerId], references: [id])
+  applyMessage  String?
+  lineContactOk Boolean       @default(false)
+  appliedAt     DateTime      @default(now())
+
+  match Match?
+}
+
+model Match {
+  id            String         @id @default(cuid())
+  applicationId String         @unique
+  application   Application    @relation(fields: [applicationId], references: [id])
+  jobId         String
+  job           JobPosting     @relation(fields: [jobId], references: [id])
+  nurseryId     String
+  nursery       NurseryProfile @relation("NurseryMatches", fields: [nurseryId], references: [id])
+  seekerId      String
+  seeker        SeekerProfile  @relation("SeekerMatches", fields: [seekerId], references: [id])
+  status        MatchStatus    @default(APPLIED)
+  lineContacted Boolean        @default(false)
+  workDate      DateTime?
+  reviewStatus  ReviewStatus   @default(NONE)
+  adminMemo     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  workReports           WorkReport[]
+  reviewNurseryToSeeker ReviewNurseryToSeeker?
+  reviewSeekerToNursery ReviewSeekerToNursery?
+}
+
+model WorkReport {
+  id           String   @id @default(cuid())
+  matchId      String
+  match        Match    @relation(fields: [matchId], references: [id])
+  reporterType String
+  completed    Boolean
+  comment      String?
+  reportedAt   DateTime @default(now())
+}
+
+model ReviewNurseryToSeeker {
+  id            String         @id @default(cuid())
+  matchId       String         @unique
+  match         Match          @relation(fields: [matchId], references: [id])
+  nurseryId     String
+  nursery       NurseryProfile @relation(fields: [nurseryId], references: [id])
+  seekerId      String
+  seeker        SeekerProfile  @relation(fields: [seekerId], references: [id])
+  attitude      Int
+  communication Int
+  skill         Int
+  comment       String?
+  wouldRehire   Boolean
+  isPublished   Boolean        @default(false)
+  reviewedAt    DateTime       @default(now())
+}
+
+model ReviewSeekerToNursery {
+  id             String         @id @default(cuid())
+  matchId        String         @unique
+  match          Match          @relation(fields: [matchId], references: [id])
+  seekerId       String
+  seeker         SeekerProfile  @relation(fields: [seekerId], references: [id])
+  nurseryId      String
+  nursery        NurseryProfile @relation(fields: [nurseryId], references: [id])
+  explanation    Int
+  atmosphere     Int
+  support        Int
+  clarity        Int
+  comment        String?
+  wouldWorkAgain Boolean
+  isPublished    Boolean        @default(false)
+  reviewedAt     DateTime       @default(now())
+}

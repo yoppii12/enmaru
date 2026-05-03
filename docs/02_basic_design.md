@@ -154,7 +154,7 @@ applied（応募あり）
 | ReviewNurseryToSeeker | 園→保育士評価 | Match 1:1 |
 | ReviewSeekerToNursery | 保育士→園評価 | Match 1:1 |
 | Message（連絡） | メッセージ | Application 1:N |
-| AdminLog（監査） | 操作ログ | 管理用 |
+| AdminLog（監査） | 操作ログ | 管理用（フェーズ2で実装予定、MVPスコープ外） |
 
 ### 6.2 DBテーブル詳細
 
@@ -163,10 +163,11 @@ applied（応募あり）
 |---------|-----|------|
 | id | UUID PK | ユーザーID |
 | email | VARCHAR UNIQUE | メールアドレス |
-| password_hash | VARCHAR | パスワードハッシュ |
 | role | ENUM | seeker / nursery / admin |
 | is_active | BOOLEAN | アカウント有効フラグ |
 | agreed_at | TIMESTAMP | 利用規約同意日時 |
+| supabase_id | VARCHAR UNIQUE | Supabase Auth の auth.users.id と紐付け（password管理はSupabase Auth側） |
+| line_user_id | VARCHAR UNIQUE | LINE Messaging API のユーザーID（登録時の友だち追加で取得・必須） |
 | created_at | TIMESTAMP | 作成日時 |
 | updated_at | TIMESTAMP | 更新日時 |
 
@@ -215,7 +216,7 @@ applied（応募あり）
 | work_date | DATE | 勤務日 |
 | work_time_start | TIME | 開始時間 |
 | work_time_end | TIME | 終了時間 |
-| hourly_wage | INTEGER | 時給 |
+| hourly_wage | INTEGER | 時給（任意：未定の場合は省略可） |
 | target_person | TEXT | 求める人物像（任意） |
 | remarks | TEXT | 備考 |
 | status | ENUM | open / closed |
@@ -253,7 +254,7 @@ applied（応募あり）
 |---------|-----|------|
 | id | UUID PK | |
 | match_id | UUID FK | matches.id |
-| reporter_type | ENUM | seeker / nursery |
+| reporter_type | VARCHAR | "seeker" または "nursery"（Prismaスキーマに合わせてString型） |
 | completed | BOOLEAN | 完了フラグ |
 | comment | TEXT | 補足（任意） |
 | reported_at | TIMESTAMP | |
@@ -360,7 +361,7 @@ applied（応募あり）
 | 勤務内容 | テキスト | ○ | 詳細説明 |
 | 勤務日 | 日付 | ○ | |
 | 勤務時間 | 時刻 | ○ | 開始〜終了 |
-| 時給 | 数値 | ○ | |
+| 時給 | 数値 | × | 任意（未定の場合は省略可） |
 | 求める人物像 | テキスト | × | 任意 |
 | 備考 | テキスト | × | 任意 |
 
