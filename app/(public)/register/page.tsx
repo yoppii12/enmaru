@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import CardActionArea from '@mui/material/CardActionArea'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -193,9 +194,7 @@ type RoleCardProps = {
 function RoleCard({ selected, onClick, icon, title, description }: RoleCardProps) {
   return (
     <Card
-      onClick={onClick}
       sx={{
-        cursor: 'pointer',
         border: '2px solid',
         borderColor: selected ? '#F4A7B9' : '#E0E0E0',
         bgcolor: selected ? '#FFF0F3' : '#FFFFFF',
@@ -203,15 +202,17 @@ function RoleCard({ selected, onClick, icon, title, description }: RoleCardProps
         '&:hover': { borderColor: '#F4A7B9' },
       }}
     >
-      <CardContent sx={{ textAlign: 'center', p: { xs: 1.5, md: 2 }, '&:last-child': { pb: { xs: 1.5, md: 2 } } }}>
-        {icon}
-        <Typography variant="subtitle2" sx={{ mt: 0.5, fontWeight: 700 }}>
-          {title}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25, lineHeight: 1.4 }}>
-          {description}
-        </Typography>
-      </CardContent>
+      <CardActionArea onClick={onClick}>
+        <CardContent sx={{ textAlign: 'center', p: { xs: 1.5, md: 2 }, '&:last-child': { pb: { xs: 1.5, md: 2 } } }}>
+          {icon}
+          <Typography variant="subtitle2" sx={{ mt: 0.5, fontWeight: 700 }}>
+            {title}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25, lineHeight: 1.4 }}>
+            {description}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   )
 }
