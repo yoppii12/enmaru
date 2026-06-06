@@ -5,15 +5,17 @@ import Divider from '@mui/material/Divider'
 import PageContainer from '@/components/ui/PageContainer'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
+import { getCurrentUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: '利用規約 | えんまーる',
 }
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const user = await getCurrentUser()
   return (
     <>
-      <Header />
+      <Header role={user?.role ?? null} email={user?.email ?? null} />
       <PageContainer maxWidth="md">
         <Typography variant="h1" sx={{ fontSize: { xs: '1.375rem', md: '1.75rem' }, mb: 1 }}>
           利用規約

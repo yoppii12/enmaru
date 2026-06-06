@@ -14,16 +14,18 @@ import VerifiedIcon from '@mui/icons-material/Verified'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
+import { getCurrentUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'えんまーる | 保育士と保育園のスポットマッチング',
   description: 'えんまーるは長崎市内の保育士と保育園をつなぐスポットマッチングプラットフォームです。ブランクがある保育士も、短時間から働けます。',
 }
 
-export default function TopPage() {
+export default async function TopPage() {
+  const user = await getCurrentUser()
   return (
     <>
-      <Header />
+      <Header role={user?.role ?? null} email={user?.email ?? null} />
 
       {/* 1. ヒーロー */}
       <Box sx={{ bgcolor: '#FFFFFF', pt: { xs: 6, md: 10 }, pb: { xs: 6, md: 8 } }}>

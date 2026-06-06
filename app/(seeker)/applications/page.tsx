@@ -10,6 +10,8 @@ import StatusChip from '@/components/ui/StatusChip'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ApplicationsPage() {
   const user = await getCurrentUser()
   if (!user || user.role !== 'SEEKER') redirect('/login')
@@ -37,7 +39,7 @@ export default async function ApplicationsPage() {
 
   return (
     <>
-      <Header role="SEEKER" />
+      <Header role="SEEKER" email={user.email} />
       <PageContainer>
         <SectionHeading>応募履歴</SectionHeading>
 

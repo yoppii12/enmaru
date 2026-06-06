@@ -10,6 +10,7 @@ import SectionHeading from '@/components/ui/SectionHeading'
 import NurseryCard from '@/components/common/NurseryCard'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
+import { getCurrentUser } from '@/lib/auth'
 import type { PublicNurseryInfo } from '@/types'
 
 export const metadata: Metadata = {
@@ -65,11 +66,11 @@ async function getNurseries(): Promise<PublicNurseryInfo[]> {
 }
 
 export default async function NurseriesPage() {
-  const nurseries = await getNurseries()
+  const [nurseries, user] = await Promise.all([getNurseries(), getCurrentUser()])
 
   return (
     <>
-      <Header />
+      <Header role={user?.role ?? null} email={user?.email ?? null} />
       <PageContainer>
         <SectionHeading subtitle="スポットサポートを募集している保育施設">
           保育園一覧

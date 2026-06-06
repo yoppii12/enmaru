@@ -11,16 +11,18 @@ import PageContainer from '@/components/ui/PageContainer'
 import SectionHeading from '@/components/ui/SectionHeading'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
+import { getCurrentUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'えんまーるとは | えんまーる',
   description: 'えんまーるは、保育士と保育園をつなぐスポットマッチングプラットフォームです。',
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const user = await getCurrentUser()
   return (
     <>
-      <Header />
+      <Header role={user?.role ?? null} email={user?.email ?? null} />
       <PageContainer maxWidth="md">
         <Box sx={{ mb: 4 }}>
           <Typography variant="h1" sx={{ fontSize: { xs: '1.5rem', md: '2rem' }, mb: 1.5 }}>

@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import { getCurrentUser } from '@/lib/auth'
+
+export const dynamic = 'force-dynamic'
 import { db } from '@/lib/db'
 import PageContainer from '@/components/ui/PageContainer'
 import SectionHeading from '@/components/ui/SectionHeading'
@@ -35,7 +37,7 @@ export default async function NurseryApplicationsPage() {
 
   return (
     <>
-      <Header role="NURSERY" />
+      <Header role="NURSERY" email={user.email} />
       <PageContainer>
         <SectionHeading subtitle="保育士の本名はマッチング成立後に開示されます">
           応募管理

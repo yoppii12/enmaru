@@ -15,6 +15,8 @@ import SectionHeading from '@/components/ui/SectionHeading'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NurseryJobsPage() {
   const user = await getCurrentUser()
   if (!user || user.role !== 'NURSERY') redirect('/login')
@@ -32,7 +34,7 @@ export default async function NurseryJobsPage() {
 
   return (
     <>
-      <Header role="NURSERY" />
+      <Header role="NURSERY" email={user.email} />
       <PageContainer>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <SectionHeading>募集管理</SectionHeading>
