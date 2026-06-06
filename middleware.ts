@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // 未認証チェック
-  const protectedPaths = ['/mypage', '/profile', '/applications', '/reviews', '/nursery', '/admin']
+  const protectedPaths = ['/mypage', '/profile', '/applications', '/matches', '/reviews', '/nursery', '/admin']
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
   if (isProtected && !user) {
@@ -46,6 +46,7 @@ export const config = {
     '/mypage/:path*',
     '/profile/:path*',
     '/applications/:path*',
+    '/matches/:path*',
     '/reviews/:path*',
     '/nursery/:path*',
     '/admin/:path*',

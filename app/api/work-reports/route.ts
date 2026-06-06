@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const hasNursery = allReports.some((r) => r.reporterType === 'NURSERY')
 
     if (hasSeeker && hasNursery) {
-      await db.match.update({ where: { id: matchId }, data: { status: 'COMPLETED' } })
+      await db.match.update({ where: { id: matchId }, data: { status: 'COMPLETED', completedAt: new Date() } })
 
       // 管理者に通知
       const adminUsers = await db.user.findMany({ where: { role: 'ADMIN' } })

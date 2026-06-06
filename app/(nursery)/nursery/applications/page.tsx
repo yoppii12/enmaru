@@ -2,7 +2,9 @@ import { redirect } from 'next/navigation'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -130,12 +132,25 @@ function MatchCard({ match }: MatchCardProps) {
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', gap: 1.5, mt: 1 }}>
-        <Typography variant="caption" color="text.secondary">
-          応募日: {new Date(match.application.appliedAt).toLocaleDateString('ja-JP')}
-        </Typography>
-        {match.application.lineContactOk && (
-          <Typography variant="caption" sx={{ color: '#2E7D32' }}>LINE連絡OK</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Typography variant="caption" color="text.secondary">
+            応募日: {new Date(match.application.appliedAt).toLocaleDateString('ja-JP')}
+          </Typography>
+          {match.application.lineContactOk && (
+            <Typography variant="caption" sx={{ color: '#2E7D32' }}>LINE連絡OK</Typography>
+          )}
+        </Box>
+        {['MATCHED', 'WORKING', 'COMPLETED', 'REVIEW_OPEN', 'REVIEW_DONE'].includes(match.status) && (
+          <Button
+            component={Link}
+            href={`/nursery/matches/${match.id}`}
+            size="small"
+            variant="outlined"
+            sx={{ fontSize: '0.75rem', borderColor: '#F4A7B9', color: '#F4A7B9' }}
+          >
+            詳細・チャット
+          </Button>
         )}
       </Box>
     </Box>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, AuthError } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { notifyApplicationReceived } from '@/lib/line'
+import { notifyMatchingConfirmed } from '@/lib/line'
 
 export async function GET() {
   try {
@@ -51,20 +51,31 @@ export async function POST(request: NextRequest) {
     if (!jobId) return NextResponse.json({ error: '募集IDは必須です' }, { status: 400 })
 
     // 重複応募チェック
-    const existing = await db.application.findFirst({
+    const existingApp = await db.application.findFirst({
       where: { jobId, seekerId: profile.id },
     })
-    if (existing) {
+    if (existingApp) {
       return NextResponse.json({ error: 'この募集にはすでに応募済みです' }, { status: 409 })
     }
 
-    // 募集存在確認
+    // 募集が存在・OPENであること確認
     const job = await db.jobPosting.findUnique({
       where: { id: jobId, status: 'OPEN' },
-      include: { nursery: { include: { user: { select: { lineUserId: true } } } } },
+      include: {
+        nursery: {
+          include: { user: { select: { lineUserId: true } } },
+        },
+      },
     })
-    if (!job) return NextResponse.json({ error: '募集情報が見つかりません' }, { status: 404 })
+    if (!job) return NextResponse.json({ error: 'この募集は受付を終了しました' }, { status: 409 })
 
+    // seekerのlineUserIdを取得
+    const seekerUser = await db.user.findUnique({
+      where: { id: user.id },
+      select: { lineUserId: true },
+    })
+
+    // Application と Match を作成（即時MATCHED）
     const application = await db.application.create({
       data: {
         jobId,
@@ -74,20 +85,27 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // マッチングレコード作成
     await db.match.create({
       data: {
         applicationId: application.id,
         jobId,
         nurseryId: job.nurseryId,
         seekerId: profile.id,
+        status: 'MATCHED',
       },
     })
 
-    // LINE通知
-    await notifyApplicationReceived(
-      job.nursery.user.lineUserId,
-      profile.displayName ?? '保育士',
+    // 募集をCLOSEDにする（先着順）
+    await db.jobPosting.update({
+      where: { id: jobId },
+      data: { status: 'CLOSED' },
+    })
+
+    // 双方にマッチング成立LINE通知
+    await notifyMatchingConfirmed(
+      seekerUser?.lineUserId ?? null,
+      job.nursery.user.lineUserId ?? null,
+      job.nursery.nurseryName,
       job.title
     )
 

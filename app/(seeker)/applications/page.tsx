@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -81,9 +82,22 @@ export default async function ApplicationsPage() {
                   </Box>
                   {app.match && <StatusChip status={app.match.status} />}
                 </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                  応募日: {new Date(app.appliedAt).toLocaleDateString('ja-JP')}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    応募日: {new Date(app.appliedAt).toLocaleDateString('ja-JP')}
+                  </Typography>
+                  {app.match && ['MATCHED', 'WORKING', 'COMPLETED', 'REVIEW_OPEN', 'REVIEW_DONE'].includes(app.match.status) && (
+                    <Button
+                      component={Link}
+                      href={`/matches/${app.match.id}`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ fontSize: '0.75rem', borderColor: '#F4A7B9', color: '#F4A7B9' }}
+                    >
+                      詳細・チャット
+                    </Button>
+                  )}
+                </Box>
               </Box>
             ))}
           </Box>
