@@ -132,7 +132,7 @@ export default function ChatPanel({ matchId, currentUserId, chatOpen }: Props) {
             <TextField
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSend() } }}
               placeholder="メッセージを入力..."
               multiline
               maxRows={3}
