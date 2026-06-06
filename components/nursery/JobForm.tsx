@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import FormHelperText from '@mui/material/FormHelperText'
 
 export type JobFormState = {
   title: string
@@ -24,8 +26,20 @@ type Props = {
 }
 
 export default function JobForm({ form, setForm, onSubmit, saving, submitLabel }: Props) {
+  const [timeError, setTimeError] = useState<string | null>(null)
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setTimeError(null)
+    if (form.workTimeStart && form.workTimeEnd && form.workTimeEnd <= form.workTimeStart) {
+      setTimeError('終了時刻は開始時刻より後に設定してください')
+      return
+    }
+    onSubmit(e)
+  }
+
   return (
-    <Box component="form" onSubmit={onSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <TextField
         label="タイトル"
         value={form.title}
@@ -77,8 +91,12 @@ export default function JobForm({ form, setForm, onSubmit, saving, submitLabel }
           fullWidth
           size="small"
           InputLabelProps={{ shrink: true }}
+          error={!!timeError}
         />
       </Box>
+      {timeError && (
+        <FormHelperText error sx={{ mx: 0, mt: -1 }}>{timeError}</FormHelperText>
+      )}
 
       <TextField
         label="時給（円・任意）"

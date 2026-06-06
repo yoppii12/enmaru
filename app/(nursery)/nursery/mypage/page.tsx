@@ -17,6 +17,8 @@ import PageContainer from '@/components/ui/PageContainer'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NurseryMypagePage() {
   const user = await getCurrentUser()
   if (!user || user.role !== 'NURSERY') redirect('/login')
@@ -63,7 +65,7 @@ export default async function NurseryMypagePage() {
 
   return (
     <>
-      <Header role="NURSERY" />
+      <Header role="NURSERY" email={user.email} />
       <PageContainer>
         {/* あいさつ */}
         <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>

@@ -17,6 +17,8 @@ import SectionHeading from '@/components/ui/SectionHeading'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 
+export const dynamic = 'force-dynamic'
+
 type Props = { params: { id: string } }
 
 export default async function SeekerNurseryDetailPage({ params }: Props) {
@@ -161,17 +163,17 @@ export default async function SeekerNurseryDetailPage({ params }: Props) {
                             この募集に応募する
                           </Button>
                         )
-                      ) : (
+                      ) : !user ? (
                         <Button
                           component={Link}
-                          href="/register"
+                          href={`/login?next=/applications/new?jobId=${job.id}`}
                           variant="outlined"
                           size="small"
                           sx={{ fontSize: '0.8rem', borderColor: '#F4A7B9', color: '#F4A7B9' }}
                         >
-                          登録して応募する
+                          ログインして応募する
                         </Button>
-                      )}
+                      ) : null}
                     </CardContent>
                   </Card>
                 )

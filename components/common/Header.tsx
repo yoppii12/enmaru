@@ -53,9 +53,10 @@ function getNavItems(role: UserRole | null): NavItem[] {
 
 type Props = {
   role?: UserRole | null
+  email?: string | null
 }
 
-export default function Header({ role = null }: Props) {
+export default function Header({ role = null, email = null }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const router = useRouter()
   const navItems = getNavItems(role)
@@ -114,16 +115,33 @@ export default function Header({ role = null }: Props) {
           <Box sx={{ flexGrow: { xs: 1, md: 0 } }} />
 
           {/* ログイン/ログアウト (PC) */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
             {role ? (
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={handleLogout}
-                sx={{ borderColor: '#AAAAAA', color: '#666666', fontSize: '0.8rem' }}
-              >
-                ログアウト
-              </Button>
+              <>
+                {email && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#AAAAAA',
+                      fontSize: '0.75rem',
+                      maxWidth: 180,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {email}
+                  </Typography>
+                )}
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleLogout}
+                  sx={{ borderColor: '#AAAAAA', color: '#666666', fontSize: '0.8rem' }}
+                >
+                  ログアウト
+                </Button>
+              </>
             ) : (
               <>
                 <Button

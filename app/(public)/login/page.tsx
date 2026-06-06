@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -11,9 +11,11 @@ import MuiLink from '@mui/material/Link'
 import NextLink from 'next/link'
 import PageContainer from '@/components/ui/PageContainer'
 import ErrorAlert from '@/components/common/ErrorAlert'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -38,7 +40,9 @@ export default function LoginPage() {
       return
     }
 
-    router.push(data.redirectPath)
+    const next = searchParams.get('next')
+    const redirectTo = next && next.startsWith('/') ? next : data.redirectPath
+    router.push(redirectTo)
     router.refresh()
   }
 
@@ -97,5 +101,13 @@ export default function LoginPage() {
         </MuiLink>
       </Typography>
     </PageContainer>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner fullPage />}>
+      <LoginForm />
+    </Suspense>
   )
 }

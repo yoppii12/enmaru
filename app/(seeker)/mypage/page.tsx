@@ -16,6 +16,8 @@ import PageContainer from '@/components/ui/PageContainer'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SeekerMypagePage() {
   const user = await getCurrentUser()
   if (!user || user.role !== 'SEEKER') redirect('/login')
@@ -67,7 +69,7 @@ export default async function SeekerMypagePage() {
 
   return (
     <>
-      <Header role="SEEKER" />
+      <Header role="SEEKER" email={user.email} />
       <PageContainer>
         {/* あいさつ */}
         <Box sx={{ mb: 3 }}>
