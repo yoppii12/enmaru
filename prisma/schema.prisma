@@ -34,6 +34,19 @@ enum JobStatus {
   CLOSED
 }
 
+enum DocumentType {
+  LICENSE
+  HEALTH_CHECK
+  STOOL_TEST
+  RESUME
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id         String    @id @default(cuid())
   email      String    @unique
@@ -73,6 +86,7 @@ model SeekerProfile {
   matches         Match[]                 @relation("SeekerMatches")
   reviewsGiven    ReviewSeekerToNursery[]
   reviewsReceived ReviewNurseryToSeeker[]
+  documents       Document[]
 }
 
 model NurseryProfile {
@@ -172,6 +186,18 @@ model Message {
   sender    User     @relation(fields: [senderId], references: [id])
   body      String
   createdAt DateTime @default(now())
+}
+
+model Document {
+  id              String         @id @default(cuid())
+  seekerId        String
+  seeker          SeekerProfile  @relation(fields: [seekerId], references: [id])
+  documentType    DocumentType
+  fileUrl         String
+  status          DocumentStatus @default(PENDING)
+  rejectionReason String?
+  uploadedAt      DateTime       @default(now())
+  verifiedAt      DateTime?
 }
 
 model ReviewNurseryToSeeker {

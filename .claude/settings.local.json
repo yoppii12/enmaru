@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --app --no-src-dir --no-tailwind --import-alias \"@/*\" --eslint --yes)",
+      "Bash(npx create-next-app@14 . --typescript --app --no-src-dir --no-tailwind --import-alias \"@/*\" --eslint --yes)",
+      "Bash(nvm --version)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/node --version)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/npm --version)",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v20.18.0/bin:$PATH\")",
+      "Bash(mv /Users/user/00_projects/enmaru/.claude /tmp/enmaru_claude_bak)",
+      "Bash(mv /tmp/enmaru_claude_bak /Users/user/00_projects/enmaru/.claude)",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(grep -n \"^\\\\.env$\" /Users/user/00_projects/enmaru/.gitignore)",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(rm \"/Users/user/00_projects/enmaru/app/\\(public\\)/nurseries/[id]/page.tsx\")",
+      "Bash(rmdir \"/Users/user/00_projects/enmaru/app/\\(public\\)/nurseries/[id]\")",
+      "Bash(rm -f \"/Users/user/00_projects/enmaru/app/\\(public\\)/nurseries/[id]/page.tsx\")",
+      "Bash(docker info *)",
+      "Bash(npx supabase *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)"
+    ]
+  }
+}

@@ -58,6 +58,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'この募集にはすでに応募済みです' }, { status: 409 })
     }
 
+    // 必須書類チェック（HEALTH_CHECK・RESUME が APPROVED であること）
+    const approvedTypes = await db.document.findMany({
+      where: { seekerId: profile.id, status: 'APPROVED' },
+      select: { documentType: true },
+    })
+    const approvedSet = new Set(approvedTypes.map((d) => d.documentType))
+    const missing = (['HEALTH_CHECK', 'RESUME'] as const).filter((t) => !approvedSet.has(t))
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: '応募には書類の認証が必要です', missingDocuments: missing },
+        { status: 403 }
+      )
+    }
+
     // 募集が存在・OPENであること確認
     const job = await db.jobPosting.findUnique({
       where: { id: jobId, status: 'OPEN' },
