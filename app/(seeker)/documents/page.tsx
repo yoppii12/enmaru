@@ -16,8 +16,8 @@ const DOCUMENT_LABELS: Record<string, string> = {
   RESUME: '履歴書',
 }
 
-const REQUIRED_TYPES = ['LICENSE', 'HEALTH_CHECK']
-const OPTIONAL_TYPES = ['STOOL_TEST', 'RESUME']
+const REQUIRED_TYPES = ['HEALTH_CHECK', 'RESUME']
+const OPTIONAL_TYPES = ['LICENSE', 'STOOL_TEST']
 
 export default async function DocumentsPage() {
   const user = await getCurrentUser()

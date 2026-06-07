@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       select: { documentType: true },
     })
     const approvedSet = new Set(approvedTypes.map((d) => d.documentType))
-    const missing = (['LICENSE', 'HEALTH_CHECK'] as const).filter((t) => !approvedSet.has(t))
+    const missing = (['HEALTH_CHECK', 'RESUME'] as const).filter((t) => !approvedSet.has(t))
     if (missing.length > 0) {
       return NextResponse.json(
         { error: '応募には書類の認証が必要です', missingDocuments: missing },

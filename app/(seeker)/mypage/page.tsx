@@ -39,7 +39,7 @@ export default async function SeekerMypagePage() {
   const approvedTypes = new Set(
     documents.filter((d) => d.status === 'APPROVED').map((d) => d.documentType)
   )
-  const hasMissingRequired = !approvedTypes.has('LICENSE') || !approvedTypes.has('HEALTH_CHECK')
+  const hasMissingRequired = !approvedTypes.has('HEALTH_CHECK') || !approvedTypes.has('RESUME')
   const hasPending = documents.some((d) => d.status === 'PENDING')
 
   const applicationCount = profile
