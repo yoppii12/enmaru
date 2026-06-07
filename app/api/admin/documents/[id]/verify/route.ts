@@ -32,12 +32,24 @@ export async function PATCH(
     data: { status: 'APPROVED', verifiedAt: new Date() },
   })
 
+  // 全必須書類が揃ったか確認（今回承認分も含める）
+  const approvedDocs = await db.document.findMany({
+    where: { seekerId: document.seekerId, status: 'APPROVED' },
+    select: { documentType: true },
+  })
+  const approvedSet = new Set(approvedDocs.map((d) => d.documentType))
+  const allRequiredApproved = ['HEALTH_CHECK', 'RESUME'].every((t) => approvedSet.has(t))
+
   const label = DOCUMENT_LABELS[document.documentType] ?? document.documentType
+  const body = allRequiredApproved
+    ? `${label}が認証されました。必須書類が揃い、応募が可能になりました。`
+    : `${label}が認証されました。引き続き必要な書類をご提出ください。`
+
   await createNotification(
     document.seeker.user.id,
     NOTIFICATION_TYPES.DOCUMENT_APPROVED,
     '書類が認証されました',
-    `${label}が認証されました。応募が可能になりました。`,
+    body,
     '/documents'
   )
 
