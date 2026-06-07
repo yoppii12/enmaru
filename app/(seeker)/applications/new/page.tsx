@@ -9,6 +9,8 @@ import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
+import Alert from '@mui/material/Alert'
+import Link from 'next/link'
 import PageContainer from '@/components/ui/PageContainer'
 import SectionHeading from '@/components/ui/SectionHeading'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
@@ -36,6 +38,7 @@ function ApplicationForm() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [missingDocuments, setMissingDocuments] = useState<string[]>([])
 
   useEffect(() => {
     if (!jobId) { setLoading(false); return }
@@ -64,6 +67,9 @@ function ApplicationForm() {
 
     if (!res.ok) {
       setError(data.error ?? '応募に失敗しました')
+      if (res.status === 403 && data.missingDocuments) {
+        setMissingDocuments(data.missingDocuments)
+      }
       return
     }
 
@@ -76,6 +82,19 @@ function ApplicationForm() {
     <>
       <SectionHeading>応募する</SectionHeading>
       <ErrorAlert message={error} />
+      {missingDocuments.length > 0 && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          応募には書類の認証が必要です。
+          <Typography
+            component={Link}
+            href="/documents"
+            variant="body2"
+            sx={{ ml: 1, color: 'inherit', textDecoration: 'underline' }}
+          >
+            書類管理ページへ
+          </Typography>
+        </Alert>
+      )}
 
       {!jobId && (
         <Typography color="text.secondary">募集IDが指定されていません</Typography>

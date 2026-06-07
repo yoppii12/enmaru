@@ -10,6 +10,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import SearchIcon from '@mui/icons-material/Search'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import StarIcon from '@mui/icons-material/Star'
+import Alert from '@mui/material/Alert'
+import FolderIcon from '@mui/icons-material/Folder'
 import { getCurrentUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 import PageContainer from '@/components/ui/PageContainer'
@@ -26,6 +28,19 @@ export default async function SeekerMypagePage() {
     where: { userId: user.id },
     select: { id: true, displayName: true },
   })
+
+  const documents = profile
+    ? await db.document.findMany({
+        where: { seekerId: profile.id },
+        orderBy: { uploadedAt: 'desc' },
+      })
+    : []
+
+  const approvedTypes = new Set(
+    documents.filter((d) => d.status === 'APPROVED').map((d) => d.documentType)
+  )
+  const hasMissingRequired = !approvedTypes.has('LICENSE') || !approvedTypes.has('HEALTH_CHECK')
+  const hasPending = documents.some((d) => d.status === 'PENDING')
 
   const applicationCount = profile
     ? await db.application.count({ where: { seekerId: profile.id } })
@@ -71,6 +86,32 @@ export default async function SeekerMypagePage() {
     <>
       <Header role="SEEKER" email={user.email} />
       <PageContainer>
+        {/* 書類ステータスバナー */}
+        {hasMissingRequired && (
+          <Alert
+            severity="warning"
+            icon={<FolderIcon />}
+            sx={{ mb: 2 }}
+            action={
+              <Typography
+                component={Link}
+                href="/documents"
+                variant="caption"
+                sx={{ color: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}
+              >
+                書類管理へ
+              </Typography>
+            }
+          >
+            応募には保育士証・健康診断書の認証が必要です
+          </Alert>
+        )}
+        {!hasMissingRequired && hasPending && (
+          <Alert severity="info" icon={<FolderIcon />} sx={{ mb: 2 }}>
+            書類を確認中です。認証まで少々お待ちください。
+          </Alert>
+        )}
+
         {/* あいさつ */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h1" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' }, mb: 0.5 }}>

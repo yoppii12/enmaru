@@ -26,6 +26,7 @@ const SEEKER_NAV: NavItem[] = [
   { label: 'プロフィール', href: '/profile' },
   { label: '保育園を探す', href: '/nurseries' },
   { label: '応募履歴', href: '/applications' },
+  { label: '書類管理', href: '/documents' },
 ]
 
 const NURSERY_NAV: NavItem[] = [
@@ -37,6 +38,7 @@ const NURSERY_NAV: NavItem[] = [
 
 const ADMIN_NAV: NavItem[] = [
   { label: 'マッチング管理', href: '/admin/matches' },
+  { label: '書類確認', href: '/admin/documents' },
 ]
 
 const PUBLIC_NAV: NavItem[] = [
