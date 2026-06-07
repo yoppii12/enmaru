@@ -41,7 +41,7 @@ export default async function DocumentsPage() {
     <>
       <Header role="SEEKER" email={user.email} />
       <PageContainer>
-        <SectionHeading subtitle="応募には保育士証・健康診断書の認証が必要です">
+        <SectionHeading subtitle="応募には健康診断書・履歴書の認証が必要です">
           書類管理
         </SectionHeading>
 

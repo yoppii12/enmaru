@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'この募集にはすでに応募済みです' }, { status: 409 })
     }
 
-    // 必須書類チェック（LICENSE・HEALTH_CHECK が APPROVED であること）
+    // 必須書類チェック（HEALTH_CHECK・RESUME が APPROVED であること）
     const approvedTypes = await db.document.findMany({
       where: { seekerId: profile.id, status: 'APPROVED' },
       select: { documentType: true },

@@ -103,7 +103,7 @@ export default async function SeekerMypagePage() {
               </Typography>
             }
           >
-            応募には保育士証・健康診断書の認証が必要です
+            応募には健康診断書・履歴書の認証が必要です
           </Alert>
         )}
         {!hasMissingRequired && hasPending && (
