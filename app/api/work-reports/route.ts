@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, AuthError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { notifyWorkCompleted } from '@/lib/line'
+import { createNotification, NOTIFICATION_TYPES } from '@/lib/notifications'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +17,8 @@ export async function POST(request: NextRequest) {
     const match = await db.match.findUnique({
       where: { id: matchId },
       include: {
-        seeker: { include: { user: { select: { lineUserId: true } } } },
-        nursery: { include: { user: { select: { lineUserId: true } } } },
+        seeker: { include: { user: { select: { id: true, lineUserId: true } } } },
+        nursery: { include: { user: { select: { id: true, lineUserId: true } } } },
       },
     })
     if (!match) return NextResponse.json({ error: 'マッチングが見つかりません' }, { status: 404 })
@@ -49,6 +50,18 @@ export async function POST(request: NextRequest) {
     const report = await db.workReport.create({
       data: { matchId, reporterType, completed, comment: comment || null },
     })
+
+    // 相手に業務完了報告の通知
+    const otherUserId = reporterType === 'SEEKER'
+      ? match.nursery.user.id
+      : match.seeker.user.id
+    await createNotification(
+      otherUserId,
+      NOTIFICATION_TYPES.WORK_REPORT_SUBMITTED,
+      '業務完了が報告されました',
+      '相手が業務完了を報告しました。あなたも報告してください。',
+      reporterType === 'SEEKER' ? `/nursery/matches/${matchId}` : `/matches/${matchId}`
+    )
 
     // 双方の報告が揃ったか確認
     const allReports = await db.workReport.findMany({ where: { matchId } })

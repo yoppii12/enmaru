@@ -59,5 +59,6 @@ export const config = {
     '/api/reviews/:path*',
     '/api/applications/:path*',
     '/api/documents/:path*',
+    '/api/notifications/:path*',
   ],
 }

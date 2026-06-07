@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, AuthError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { notifyMatchingConfirmed } from '@/lib/line'
+import { createNotification, NOTIFICATION_TYPES } from '@/lib/notifications'
 
 export async function GET() {
   try {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       where: { id: jobId, status: 'OPEN' },
       include: {
         nursery: {
-          include: { user: { select: { lineUserId: true } } },
+          include: { user: { select: { id: true, lineUserId: true } } },
         },
       },
     })
@@ -121,6 +122,22 @@ export async function POST(request: NextRequest) {
       job.nursery.user.lineUserId ?? null,
       job.nursery.nurseryName,
       job.title
+    )
+
+    // 双方にアプリ内通知
+    await createNotification(
+      user.id,
+      NOTIFICATION_TYPES.MATCH_CONFIRMED,
+      'マッチング成立',
+      `${job.nursery.nurseryName}「${job.title}」のマッチングが成立しました`,
+      `/matches/${application.id}`
+    )
+    await createNotification(
+      job.nursery.user.id,
+      NOTIFICATION_TYPES.MATCH_CONFIRMED,
+      'マッチング成立',
+      `「${job.title}」に保育士がマッチングしました`,
+      `/nursery/applications`
     )
 
     return NextResponse.json({ application }, { status: 201 })

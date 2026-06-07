@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, AuthError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { notifyMatchingConfirmed, notifyReviewRequest } from '@/lib/line'
+import { createNotification, NOTIFICATION_TYPES } from '@/lib/notifications'
 
 const VALID_STATUSES = ['APPLIED', 'SCREENING', 'MATCHED', 'WORKING', 'COMPLETED', 'REVIEW_OPEN', 'REVIEW_DONE']
 
@@ -22,8 +23,8 @@ export async function PATCH(
     const existing = await db.match.findUnique({
       where: { id: params.id },
       include: {
-        nursery: { include: { user: { select: { lineUserId: true } } } },
-        seeker: { include: { user: { select: { lineUserId: true } } } },
+        nursery: { include: { user: { select: { id: true, lineUserId: true } } } },
+        seeker: { include: { user: { select: { id: true, lineUserId: true } } } },
         job: { select: { title: true } },
       },
     })
@@ -52,6 +53,20 @@ export async function PATCH(
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
       await notifyReviewRequest(existing.seeker.user.lineUserId, appUrl, params.id)
       await notifyReviewRequest(existing.nursery.user.lineUserId, appUrl, params.id)
+      await createNotification(
+        existing.seeker.user.id,
+        NOTIFICATION_TYPES.REVIEW_REQUESTED,
+        'レビューをお願いします',
+        `${existing.nursery.nurseryName}への評価を投稿してください`,
+        `/reviews/${params.id}`
+      )
+      await createNotification(
+        existing.nursery.user.id,
+        NOTIFICATION_TYPES.REVIEW_REQUESTED,
+        'レビューをお願いします',
+        `担当保育士への評価を投稿してください`,
+        `/nursery/reviews/${params.id}`
+      )
     }
 
     return NextResponse.json({ match })

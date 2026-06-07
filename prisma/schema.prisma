@@ -62,6 +62,19 @@ model User {
   seekerProfile  SeekerProfile?
   nurseryProfile NurseryProfile?
   messages       Message[]
+  notifications  Notification[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  body      String
+  linkUrl   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model SeekerProfile {

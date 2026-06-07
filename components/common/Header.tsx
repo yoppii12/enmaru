@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Badge from '@mui/material/Badge'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
@@ -15,9 +16,12 @@ import Divider from '@mui/material/Divider'
 import Box from '@mui/material/Box'
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
+import NotificationsIcon from '@mui/icons-material/Notifications'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { UserRole } from '@/types'
+import { useUnreadCount } from '@/hooks/useUnreadCount'
+import NotificationDrawer from '@/components/common/NotificationDrawer'
 
 type NavItem = { label: string; href: string }
 
@@ -60,8 +64,10 @@ type Props = {
 
 export default function Header({ role = null, email = null }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
   const router = useRouter()
   const navItems = getNavItems(role)
+  const { count: unreadCount, refresh: refreshCount } = useUnreadCount()
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -116,6 +122,19 @@ export default function Header({ role = null, email = null }: Props) {
 
           <Box sx={{ flexGrow: { xs: 1, md: 0 } }} />
 
+          {/* ベルアイコン (PC) */}
+          {role && (
+            <IconButton
+              onClick={() => setNotifOpen(true)}
+              sx={{ display: { xs: 'none', md: 'flex' }, color: '#666666', mr: 0.5 }}
+              aria-label="通知を開く"
+            >
+              <Badge badgeContent={unreadCount > 0 ? unreadCount : undefined} color="error" max={99}>
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          )}
+
           {/* ログイン/ログアウト (PC) */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
             {role ? (
@@ -168,6 +187,19 @@ export default function Header({ role = null, email = null }: Props) {
             )}
           </Box>
 
+          {/* ベルアイコン (スマホ) */}
+          {role && (
+            <IconButton
+              onClick={() => setNotifOpen(true)}
+              sx={{ display: { xs: 'flex', md: 'none' }, color: '#666666' }}
+              aria-label="通知を開く"
+            >
+              <Badge badgeContent={unreadCount > 0 ? unreadCount : undefined} color="error" max={99}>
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          )}
+
           {/* ハンバーガー (スマホ) */}
           <IconButton
             edge="end"
@@ -179,6 +211,13 @@ export default function Header({ role = null, email = null }: Props) {
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      {/* 通知ドロワー */}
+      <NotificationDrawer
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        onRead={refreshCount}
+      />
 
       {/* モバイルドロワー */}
       <Drawer
